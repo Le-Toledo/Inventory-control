@@ -1,54 +1,54 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { rawMaterialService } from "../../services/inventoryService";
+import { servicoMateriaPrima } from "../../services/inventoryService";
 
-// Async thunk for fetching raw materials
-export const fetchRawMaterials = createAsyncThunk(
-  "rawMaterials/fetchRawMaterials",
+// Async thunk for fetching materias primas
+export const buscarMateriasPrimas = createAsyncThunk(
+  "materiasPrimas/buscarMateriasPrimas",
   async () => {
-    const response = await rawMaterialService.getAll();
+    const response = await servicoMateriaPrima.getAll();
     return response.data;
   },
 );
 
-// Async thunk for creating a raw material
-export const createRawMaterial = createAsyncThunk(
-  "rawMaterials/createRawMaterial",
-  async (rawMaterialData) => {
-    const response = await rawMaterialService.create(rawMaterialData);
+// Async thunk for creating a materia prima
+export const criarMateriaPrima = createAsyncThunk(
+  "materiasPrimas/criarMateriaPrima",
+  async (dadosMateriaPrima) => {
+    const response = await servicoMateriaPrima.create(dadosMateriaPrima);
     return response.data;
   },
 );
 
-// Async thunk for updating a raw material
-export const updateRawMaterialAsync = createAsyncThunk(
-  "rawMaterials/updateRawMaterial",
+// Async thunk for updating a materia prima
+export const atualizarMateriaPrimaAsync = createAsyncThunk(
+  "materiasPrimas/atualizarMateriaPrima",
   async ({ id, data }) => {
-    const response = await rawMaterialService.update(id, data);
+    const response = await servicoMateriaPrima.update(id, data);
     return response.data;
   },
 );
 
-// Async thunk for deleting a raw material
-export const deleteRawMaterialAsync = createAsyncThunk(
-  "rawMaterials/deleteRawMaterial",
+// Async thunk for deleting a materia prima
+export const excluirMateriaPrimaAsync = createAsyncThunk(
+  "materiasPrimas/excluirMateriaPrima",
   async (id) => {
-    await rawMaterialService.delete(id);
+    await servicoMateriaPrima.delete(id);
     return id;
   },
 );
 
-const rawMaterialsSlice = createSlice({
-  name: "rawMaterials",
+const materiasPrimasSlice = createSlice({
+  name: "materiasPrimas",
   initialState: {
     items: [],
-    loading: false,
-    error: null,
+    carregando: false,
+    erro: null,
   },
   reducers: {
-    addRawMaterial: (state, action) => {
+    adicionarMateriaPrima: (state, action) => {
       state.items.push(action.payload);
     },
-    updateRawMaterial: (state, action) => {
+    atualizarMateriaPrima: (state, action) => {
       const index = state.items.findIndex(
         (item) => item.id === action.payload.id,
       );
@@ -56,40 +56,40 @@ const rawMaterialsSlice = createSlice({
         state.items[index] = action.payload;
       }
     },
-    deleteRawMaterial: (state, action) => {
+    excluirMateriaPrima: (state, action) => {
       state.items = state.items.filter((item) => item.id !== action.payload);
     },
   },
   extraReducers: (builder) => {
     builder
-      // Fetch raw materials
-      .addCase(fetchRawMaterials.pending, (state) => {
-        state.loading = true;
-        state.error = null;
+      // Fetch materias primas
+      .addCase(buscarMateriasPrimas.pending, (state) => {
+        state.carregando = true;
+        state.erro = null;
       })
-      .addCase(fetchRawMaterials.fulfilled, (state, action) => {
+      .addCase(buscarMateriasPrimas.fulfilled, (state, action) => {
         state.items = action.payload;
-        state.loading = false;
+        state.carregando = false;
       })
-      .addCase(fetchRawMaterials.rejected, (state, action) => {
-        state.error = action.error.message;
-        state.loading = false;
+      .addCase(buscarMateriasPrimas.rejected, (state, action) => {
+        state.erro = action.error.message;
+        state.carregando = false;
       })
-      // Create raw material
-      .addCase(createRawMaterial.pending, (state) => {
-        state.loading = true;
-        state.error = null;
+      // Create materia prima
+      .addCase(criarMateriaPrima.pending, (state) => {
+        state.carregando = true;
+        state.erro = null;
       })
-      .addCase(createRawMaterial.fulfilled, (state, action) => {
+      .addCase(criarMateriaPrima.fulfilled, (state, action) => {
         state.items.push(action.payload);
-        state.loading = false;
+        state.carregando = false;
       })
-      .addCase(createRawMaterial.rejected, (state, action) => {
-        state.error = action.error.message;
-        state.loading = false;
+      .addCase(criarMateriaPrima.rejected, (state, action) => {
+        state.erro = action.error.message;
+        state.carregando = false;
       })
-      // Update raw material
-      .addCase(updateRawMaterialAsync.fulfilled, (state, action) => {
+      // Update materia prima
+      .addCase(atualizarMateriaPrimaAsync.fulfilled, (state, action) => {
         const index = state.items.findIndex(
           (item) => item.id === action.payload.id,
         );
@@ -97,14 +97,17 @@ const rawMaterialsSlice = createSlice({
           state.items[index] = action.payload;
         }
       })
-      // Delete raw material
-      .addCase(deleteRawMaterialAsync.fulfilled, (state, action) => {
+      // Delete materia prima
+      .addCase(excluirMateriaPrimaAsync.fulfilled, (state, action) => {
         state.items = state.items.filter((item) => item.id !== action.payload);
       });
   },
 });
 
-export const { addRawMaterial, updateRawMaterial, deleteRawMaterial } =
-  rawMaterialsSlice.actions;
+export const {
+  adicionarMateriaPrima,
+  atualizarMateriaPrima,
+  excluirMateriaPrima,
+} = materiasPrimasSlice.actions;
 
-export default rawMaterialsSlice.reducer;
+export default materiasPrimasSlice.reducer;

@@ -8,11 +8,11 @@ export const productService = {
   delete: (id) => api.delete(`/products/${id}`),
 };
 
-export const rawMaterialService = {
+export const servicoMateriaPrima = {
   getAll: () => api.get("/raw-materials"),
   getById: (id) => api.get(`/raw-materials/${id}`),
-  create: (rawMaterial) => api.post("/raw-materials", rawMaterial),
-  update: (id, rawMaterial) => api.put(`/raw-materials/${id}`, rawMaterial),
+  create: (materiaPrima) => api.post("/raw-materials", materiaPrima),
+  update: (id, materiaPrima) => api.put(`/raw-materials/${id}`, materiaPrima),
   delete: (id) => api.delete(`/raw-materials/${id}`),
 };
 

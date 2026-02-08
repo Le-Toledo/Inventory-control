@@ -29,7 +29,7 @@ public class Product {
     
     @NotNull(message = "Product value is required")
     @Positive(message = "Product value must be positive")
-    @Column(nullable = false, precision = 10, scale = 2)
+    @Column(name = "product_value", nullable = false, precision = 10, scale = 2)
     private BigDecimal value;
     
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)

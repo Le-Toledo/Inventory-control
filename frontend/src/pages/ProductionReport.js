@@ -4,18 +4,22 @@ import { calculateProduction } from "../store/slices/productionSlice";
 
 function ProductionReport() {
   const dispatch = useDispatch();
-  const { report, loading, error } = useSelector((state) => state.production);
+  const {
+    report: relatorio,
+    carregando,
+    erro,
+  } = useSelector((state) => state.production);
 
   useEffect(() => {
     dispatch(calculateProduction());
   }, [dispatch]);
 
-  const handleRefresh = () => {
+  const handleAtualizar = () => {
     dispatch(calculateProduction());
   };
 
-  if (loading) return <div className="loading">Calculating production...</div>;
-  if (error) return <div className="error">Error: {error}</div>;
+  if (carregando) return <div className="loading">Calculando produção...</div>;
+  if (erro) return <div className="error">Erro: {erro}</div>;
 
   return (
     <div className="container">
@@ -28,38 +32,90 @@ function ProductionReport() {
             marginBottom: "1.5rem",
           }}
         >
-          <h2>Production Report</h2>
-          <button onClick={handleRefresh} className="btn btn-primary">
-            Refresh Report
+          <h2>Relatório de Produção</h2>
+          <button onClick={handleAtualizar} className="btn btn-primary">
+            Atualizar Relatório
           </button>
         </div>
 
-        {report && (
+        {relatorio && (
           <>
             <div className="production-summary">
-              <h3>Total Production Value</h3>
-              <p>${report.totalValue?.toFixed(2) || "0.00"}</p>
+              <h3>Valor Total de Produção</h3>
+              <p>R$ {relatorio.totalValue?.toFixed(2) || "0,00"}</p>
             </div>
 
-            {report.suggestions && report.suggestions.length > 0 ? (
+            {relatorio.suggestions && relatorio.suggestions.length > 0 ? (
               <div className="table-container">
                 <table>
                   <thead>
                     <tr>
-                      <th>Product</th>
-                      <th>Unit Value</th>
-                      <th>Quantity Can Produce</th>
-                      <th>Total Value</th>
+                      <th>Produto</th>
+                      <th>Valor Unitário</th>
+                      <th>Custo Unitário</th>
+                      <th>Quantidade</th>
+                      <th>Custo Total</th>
+                      <th>Valor Total</th>
+                      <th>Lucro</th>
+                      <th>Margem</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {report.suggestions.map((suggestion) => (
-                      <tr key={suggestion.productId}>
-                        <td>{suggestion.productName}</td>
-                        <td>${suggestion.productValue?.toFixed(2)}</td>
-                        <td>{suggestion.quantityCanProduce}</td>
+                    {relatorio.suggestions.map((sugestao) => (
+                      <tr key={sugestao.productId}>
+                        <td>{sugestao.productName}</td>
                         <td>
-                          <strong>${suggestion.totalValue?.toFixed(2)}</strong>
+                          R${" "}
+                          {parseFloat(sugestao.productValue || 0)
+                            .toFixed(2)
+                            .replace(".", ",")}
+                        </td>
+                        <td>
+                          R${" "}
+                          {parseFloat(sugestao.unitCost || 0)
+                            .toFixed(2)
+                            .replace(".", ",")}
+                        </td>
+                        <td>{sugestao.quantityCanProduce}</td>
+                        <td>
+                          R${" "}
+                          {parseFloat(sugestao.totalCost || 0)
+                            .toFixed(2)
+                            .replace(".", ",")}
+                        </td>
+                        <td>
+                          <strong>
+                            R${" "}
+                            {parseFloat(sugestao.totalValue || 0)
+                              .toFixed(2)
+                              .replace(".", ",")}
+                          </strong>
+                        </td>
+                        <td
+                          style={{
+                            color:
+                              (sugestao.profit || 0) >= 0 ? "green" : "red",
+                            fontWeight: "bold",
+                          }}
+                        >
+                          R${" "}
+                          {parseFloat(sugestao.profit || 0)
+                            .toFixed(2)
+                            .replace(".", ",")}
+                        </td>
+                        <td
+                          style={{
+                            color:
+                              (sugestao.profitMargin || 0) >= 0
+                                ? "green"
+                                : "red",
+                            fontWeight: "bold",
+                          }}
+                        >
+                          {parseFloat(sugestao.profitMargin || 0)
+                            .toFixed(2)
+                            .replace(".", ",")}
+                          %
                         </td>
                       </tr>
                     ))}
@@ -75,10 +131,13 @@ function ProductionReport() {
                   borderRadius: "8px",
                 }}
               >
-                <p>No products can be produced with current stock levels.</p>
+                <p>
+                  Nenhum produto pode ser produzido com os níveis de estoque
+                  atuais.
+                </p>
                 <p style={{ marginTop: "1rem", color: "#7f8c8d" }}>
-                  Please add raw materials to your inventory or create products
-                  with available materials.
+                  Por favor, adicione matérias-primas ao seu inventário ou crie
+                  produtos com os materiais disponíveis.
                 </p>
               </div>
             )}
@@ -91,15 +150,16 @@ function ProductionReport() {
                 borderRadius: "8px",
               }}
             >
-              <h3>About this report:</h3>
+              <h3>Sobre este relatório:</h3>
               <ul style={{ marginLeft: "1.5rem", marginTop: "0.5rem" }}>
-                <li>Products are prioritized by highest value first</li>
+                <li>Produtos são priorizados pelo maior valor primeiro</li>
                 <li>
-                  Calculations are based on current raw material stock levels
+                  Cálculos são baseados nos níveis atuais de estoque de
+                  matérias-primas
                 </li>
                 <li>
-                  Raw materials are allocated optimally to maximize total
-                  production value
+                  Matérias-primas são alocadas de forma otimizada para maximizar
+                  o valor total de produção
                 </li>
               </ul>
             </div>

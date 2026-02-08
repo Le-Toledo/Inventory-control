@@ -6,124 +6,146 @@ import {
   updateProduct,
   fetchProducts,
 } from "../store/slices/productsSlice";
-import { fetchRawMaterials } from "../store/slices/rawMaterialsSlice";
+import { buscarMateriasPrimas } from "../store/slices/rawMaterialsSlice";
 
 function ProductForm() {
   const { id } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const { items: products } = useSelector((state) => state.products);
-  const { items: rawMaterials } = useSelector((state) => state.rawMaterials);
+  const { items: produtos } = useSelector((state) => state.products);
+  const { items: materiasPrimas } = useSelector(
+    (state) => state.materiasPrimas,
+  );
 
-  const [formData, setFormData] = useState({
+  const [dadosFormulario, setDadosFormulario] = useState({
     name: "",
     value: "",
-    rawMaterials: [],
+    materiasPrimas: [],
   });
 
-  const [selectedRawMaterial, setSelectedRawMaterial] = useState("");
-  const [quantity, setQuantity] = useState("");
+  const [materiaPrimaSelecionada, setMateriaPrimaSelecionada] = useState("");
+  const [quantidade, setQuantidade] = useState("");
 
   useEffect(() => {
-    dispatch(fetchRawMaterials());
+    dispatch(buscarMateriasPrimas());
     if (id) {
       dispatch(fetchProducts());
     }
   }, [dispatch, id]);
 
   useEffect(() => {
-    if (id && products.length > 0) {
-      const product = products.find((p) => p.id === parseInt(id));
-      if (product) {
-        setFormData({
-          name: product.name,
-          value: product.value,
-          rawMaterials: product.rawMaterials || [],
+    if (id && produtos.length > 0) {
+      const produto = produtos.find((p) => p.id === parseInt(id));
+      if (produto) {
+        setDadosFormulario({
+          name: produto.name,
+          value: produto.value,
+          materiasPrimas: produto.rawMaterials || [],
         });
       }
     }
-  }, [id, products]);
+  }, [id, produtos]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
+      // Converter materiasPrimas para o formato esperado pela API
+      const dadosParaAPI = {
+        name: dadosFormulario.name,
+        value: dadosFormulario.value,
+        rawMaterials: dadosFormulario.materiasPrimas.map((mp) => ({
+          rawMaterialId: mp.idMateriaPrima,
+          rawMaterialName: mp.nomeMateriaPrima,
+          quantityRequired: mp.quantidadeNecessaria,
+        })),
+      };
+
       if (id) {
-        await dispatch(updateProduct({ id: parseInt(id), product: formData }));
+        await dispatch(
+          updateProduct({ id: parseInt(id), product: dadosParaAPI }),
+        );
       } else {
-        await dispatch(createProduct(formData));
+        await dispatch(createProduct(dadosParaAPI));
       }
       navigate("/products");
-    } catch (error) {
-      alert("Error saving product: " + error.message);
+    } catch (erro) {
+      alert("Erro ao salvar produto: " + erro.message);
     }
   };
 
-  const handleAddRawMaterial = () => {
-    if (!selectedRawMaterial || !quantity || quantity <= 0) {
-      alert("Please select a raw material and enter a valid quantity");
+  const handleAdicionarMateriaPrima = () => {
+    if (!materiaPrimaSelecionada || !quantidade || quantidade <= 0) {
+      alert(
+        "Por favor, selecione uma matéria-prima e insira uma quantidade válida",
+      );
       return;
     }
 
-    const rawMaterial = rawMaterials.find(
-      (rm) => rm.id === parseInt(selectedRawMaterial),
+    const materiaPrima = materiasPrimas.find(
+      (mp) => mp.id === parseInt(materiaPrimaSelecionada),
     );
-    const newRawMaterial = {
-      rawMaterialId: rawMaterial.id,
-      rawMaterialName: rawMaterial.name,
-      quantityRequired: parseInt(quantity),
+    const novaMateriaPrima = {
+      idMateriaPrima: materiaPrima.id,
+      nomeMateriaPrima: materiaPrima.name,
+      quantidadeNecessaria: parseInt(quantidade),
     };
 
-    setFormData({
-      ...formData,
-      rawMaterials: [...formData.rawMaterials, newRawMaterial],
+    setDadosFormulario({
+      ...dadosFormulario,
+      materiasPrimas: [...dadosFormulario.materiasPrimas, novaMateriaPrima],
     });
 
-    setSelectedRawMaterial("");
-    setQuantity("");
+    setMateriaPrimaSelecionada("");
+    setQuantidade("");
   };
 
-  const handleRemoveRawMaterial = (index) => {
-    setFormData({
-      ...formData,
-      rawMaterials: formData.rawMaterials.filter((_, i) => i !== index),
+  const handleRemoverMateriaPrima = (index) => {
+    setDadosFormulario({
+      ...dadosFormulario,
+      materiasPrimas: dadosFormulario.materiasPrimas.filter(
+        (_, i) => i !== index,
+      ),
     });
   };
 
   return (
     <div className="container">
       <div className="card">
-        <h2>{id ? "Edit Product" : "New Product"}</h2>
+        <h2>{id ? "Editar Produto" : "Novo Produto"}</h2>
 
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label>Product Name *</label>
+            <label>Nome do Produto </label>
             <input
               type="text"
-              value={formData.name}
+              value={dadosFormulario.name}
               onChange={(e) =>
-                setFormData({ ...formData, name: e.target.value })
+                setDadosFormulario({ ...dadosFormulario, name: e.target.value })
               }
               required
             />
           </div>
 
           <div className="form-group">
-            <label>Value ($) *</label>
+            <label>Valor (R$) </label>
             <input
               type="number"
               step="0.01"
-              value={formData.value}
+              value={dadosFormulario.value}
               onChange={(e) =>
-                setFormData({ ...formData, value: e.target.value })
+                setDadosFormulario({
+                  ...dadosFormulario,
+                  value: e.target.value,
+                })
               }
               required
             />
           </div>
 
           <div className="card" style={{ backgroundColor: "#f8f9fa" }}>
-            <h3>Raw Materials</h3>
+            <h3>Matérias-Primas</h3>
 
             <div
               style={{
@@ -134,26 +156,26 @@ function ProductForm() {
               }}
             >
               <div style={{ flex: "1", minWidth: "200px" }}>
-                <label>Select Raw Material</label>
+                <label>Selecionar Matéria-Prima</label>
                 <select
-                  value={selectedRawMaterial}
-                  onChange={(e) => setSelectedRawMaterial(e.target.value)}
+                  value={materiaPrimaSelecionada}
+                  onChange={(e) => setMateriaPrimaSelecionada(e.target.value)}
                 >
-                  <option value="">-- Select --</option>
-                  {rawMaterials.map((rm) => (
-                    <option key={rm.id} value={rm.id}>
-                      {rm.name} (Stock: {rm.stockQuantity})
+                  <option value="">-- Selecione --</option>
+                  {materiasPrimas.map((mp) => (
+                    <option key={mp.id} value={mp.id}>
+                      {mp.name} (Estoque: {mp.stockQuantity})
                     </option>
                   ))}
                 </select>
               </div>
 
               <div style={{ flex: "0.5", minWidth: "150px" }}>
-                <label>Quantity Required</label>
+                <label>Quantidade Necessária</label>
                 <input
                   type="number"
-                  value={quantity}
-                  onChange={(e) => setQuantity(e.target.value)}
+                  value={quantidade}
+                  onChange={(e) => setQuantidade(e.target.value)}
                   min="1"
                 />
               </div>
@@ -161,29 +183,29 @@ function ProductForm() {
               <div style={{ display: "flex", alignItems: "flex-end" }}>
                 <button
                   type="button"
-                  onClick={handleAddRawMaterial}
+                  onClick={handleAdicionarMateriaPrima}
                   className="btn btn-success"
                 >
-                  Add
+                  Adicionar
                 </button>
               </div>
             </div>
 
-            {formData.rawMaterials.length > 0 && (
-              <div className="raw-materials-list">
-                <h4>Added Raw Materials:</h4>
-                {formData.rawMaterials.map((rm, index) => (
-                  <div key={index} className="raw-material-item">
+            {dadosFormulario.materiasPrimas.length > 0 && (
+              <div className="materias-primas-lista">
+                <h4>Matérias-Primas Adicionadas:</h4>
+                {dadosFormulario.materiasPrimas.map((mp, index) => (
+                  <div key={index} className="materia-prima-item">
                     <span>
-                      <strong>{rm.rawMaterialName}</strong> - Quantity:{" "}
-                      {rm.quantityRequired}
+                      <strong>{mp.nomeMateriaPrima}</strong> - Quantidade:{" "}
+                      {mp.quantidadeNecessaria}
                     </span>
                     <button
                       type="button"
-                      onClick={() => handleRemoveRawMaterial(index)}
+                      onClick={() => handleRemoverMateriaPrima(index)}
                       className="btn btn-danger"
                     >
-                      Remove
+                      Remover
                     </button>
                   </div>
                 ))}
@@ -193,14 +215,14 @@ function ProductForm() {
 
           <div className="form-actions">
             <button type="submit" className="btn btn-success">
-              {id ? "Update Product" : "Create Product"}
+              {id ? "Atualizar" : "Criar"} Produto
             </button>
             <button
               type="button"
               onClick={() => navigate("/products")}
               className="btn btn-secondary"
             >
-              Cancel
+              Cancelar
             </button>
           </div>
         </form>

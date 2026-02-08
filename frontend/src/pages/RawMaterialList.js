@@ -2,31 +2,41 @@ import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import {
-  fetchRawMaterials,
-  deleteRawMaterial,
+  buscarMateriasPrimas,
+  excluirMateriaPrimaAsync,
 } from "../store/slices/rawMaterialsSlice";
 
 function RawMaterialList() {
   const dispatch = useDispatch();
   const {
-    items: rawMaterials,
-    loading,
-    error,
-  } = useSelector((state) => state.rawMaterials);
+    items: materiasPrimas,
+    carregando,
+    erro,
+  } = useSelector((state) => state.materiasPrimas);
+
+  const obterRotuloUnidade = (unidade) => {
+    const unidades = {
+      QUANTITY: "Un",
+      WEIGHT: "Kg",
+      LITERS: "L",
+    };
+    return unidades[unidade] || "Un";
+  };
 
   useEffect(() => {
-    dispatch(fetchRawMaterials());
+    dispatch(buscarMateriasPrimas());
   }, [dispatch]);
 
-  const handleDelete = async (id) => {
-    if (window.confirm("Are you sure you want to delete this raw material?")) {
-      await dispatch(deleteRawMaterial(id));
-      dispatch(fetchRawMaterials());
+  const handleExcluir = async (id) => {
+    if (window.confirm("Tem certeza que deseja excluir esta matéria-prima?")) {
+      await dispatch(excluirMateriaPrimaAsync(id));
+      dispatch(buscarMateriasPrimas());
     }
   };
 
-  if (loading) return <div className="loading">Loading raw materials...</div>;
-  if (error) return <div className="error">Error: {error}</div>;
+  if (carregando)
+    return <div className="loading">Carregando matérias-primas...</div>;
+  if (erro) return <div className="error">Erro: {erro}</div>;
 
   return (
     <div className="container">
@@ -37,45 +47,118 @@ function RawMaterialList() {
             justifyContent: "space-between",
             alignItems: "center",
             marginBottom: "1.5rem",
+            flexWrap: "wrap",
+            gap: "1rem",
           }}
         >
-          <h2>Raw Materials</h2>
-          <Link to="/raw-materials/new" className="btn btn-primary">
-            Add New Raw Material
+          <div>
+            <h2 style={{ marginBottom: "0.5rem" }}>🧪 Matérias-Primas</h2>
+            <p style={{ color: "#7f8c8d", margin: 0 }}>
+              {materiasPrimas.length} matéria(s)-prima(s) cadastrada(s)
+            </p>
+          </div>
+          <Link to="/raw-materials/new" className="btn btn-success">
+            ➕ Adicionar Nova Matéria-Prima
           </Link>
         </div>
 
-        {rawMaterials.length === 0 ? (
-          <p>No raw materials found. Create your first raw material!</p>
+        {materiasPrimas.length === 0 ? (
+          <div
+            style={{
+              textAlign: "center",
+              padding: "3rem",
+              background: "rgba(240, 147, 251, 0.05)",
+              borderRadius: "15px",
+            }}
+          >
+            <div style={{ fontSize: "4rem", marginBottom: "1rem" }}>🧪</div>
+            <h3 style={{ color: "#2c3e50", marginBottom: "0.5rem" }}>
+              Nenhuma matéria-prima cadastrada
+            </h3>
+            <p style={{ color: "#7f8c8d", marginBottom: "1.5rem" }}>
+              Comece cadastrando suas matérias-primas!
+            </p>
+            <Link to="/raw-materials/new" className="btn btn-success">
+              ➕ Criar Primeira Matéria-Prima
+            </Link>
+          </div>
         ) : (
           <div className="table-container">
             <table>
               <thead>
                 <tr>
-                  <th>ID</th>
-                  <th>Name</th>
-                  <th>Stock Quantity</th>
-                  <th>Actions</th>
+                  <th>🆔 ID</th>
+                  <th>🧪 Nome</th>
+                  <th>📊 Estoque</th>
+                  <th>⚖️ Unidade</th>
+                  <th>💰 Custo Unitário</th>
+                  <th>⚙️ Ações</th>
                 </tr>
               </thead>
               <tbody>
-                {rawMaterials.map((material) => (
-                  <tr key={material.id}>
-                    <td>{material.id}</td>
-                    <td>{material.name}</td>
-                    <td>{material.stockQuantity}</td>
+                {materiasPrimas.map((materiaPrima) => (
+                  <tr key={materiaPrima.id}>
+                    <td>
+                      <strong>#{materiaPrima.id}</strong>
+                    </td>
+                    <td style={{ fontWeight: 600 }}>{materiaPrima.name}</td>
+                    <td>
+                      <span
+                        style={{
+                          background:
+                            materiaPrima.stockQuantity > 50
+                              ? "rgba(86, 171, 47, 0.1)"
+                              : materiaPrima.stockQuantity > 20
+                                ? "rgba(255, 193, 7, 0.1)"
+                                : "rgba(235, 59, 90, 0.1)",
+                          color:
+                            materiaPrima.stockQuantity > 50
+                              ? "#56ab2f"
+                              : materiaPrima.stockQuantity > 20
+                                ? "#ff9800"
+                                : "#eb3b5a",
+                          padding: "0.3rem 0.8rem",
+                          borderRadius: "15px",
+                          fontSize: "0.9rem",
+                          fontWeight: 700,
+                        }}
+                      >
+                        {materiaPrima.stockQuantity}
+                      </span>
+                    </td>
+                    <td>
+                      <span
+                        style={{
+                          background: "rgba(79, 172, 254, 0.1)",
+                          padding: "0.3rem 0.8rem",
+                          borderRadius: "15px",
+                          fontSize: "0.9rem",
+                          fontWeight: 600,
+                        }}
+                      >
+                        {obterRotuloUnidade(materiaPrima.unit)}
+                      </span>
+                    </td>
+                    <td style={{ color: "#e74c3c", fontWeight: 600 }}>
+                      R${" "}
+                      {parseFloat(materiaPrima.unitCost || 0)
+                        .toFixed(2)
+                        .replace(".", ",")}
+                    </td>
                     <td className="table-actions">
                       <Link
-                        to={`/raw-materials/edit/${material.id}`}
+                        to={`/raw-materials/edit/${materiaPrima.id}`}
                         className="btn btn-primary"
+                        style={{ fontSize: "0.85rem", padding: "0.5rem 1rem" }}
                       >
-                        Edit
+                        ✏️ Editar
                       </Link>
                       <button
-                        onClick={() => handleDelete(material.id)}
+                        onClick={() => handleExcluir(materiaPrima.id)}
                         className="btn btn-danger"
+                        style={{ fontSize: "0.85rem", padding: "0.5rem 1rem" }}
                       >
-                        Delete
+                        🗑️ Excluir
                       </button>
                     </td>
                   </tr>

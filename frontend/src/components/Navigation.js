@@ -6,11 +6,11 @@ function Navigation() {
 
   return (
     <nav className="navbar">
-      <h1>Inventory Management System</h1>
+      <h1>Sistema de Gestão de Estoque</h1>
       <ul className="nav-links">
         <li>
           <Link to="/" className={location.pathname === "/" ? "active" : ""}>
-            Home
+            Início
           </Link>
         </li>
         <li>
@@ -18,7 +18,7 @@ function Navigation() {
             to="/products"
             className={location.pathname.includes("/products") ? "active" : ""}
           >
-            Products
+            Produtos
           </Link>
         </li>
         <li>
@@ -28,7 +28,7 @@ function Navigation() {
               location.pathname.includes("/raw-materials") ? "active" : ""
             }
           >
-            Raw Materials
+            Matérias-Primas
           </Link>
         </li>
         <li>
@@ -36,7 +36,7 @@ function Navigation() {
             to="/production"
             className={location.pathname === "/production" ? "active" : ""}
           >
-            Production Report
+            Relatório de Produção
           </Link>
         </li>
       </ul>

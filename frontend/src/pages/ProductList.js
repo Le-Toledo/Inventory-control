@@ -6,24 +6,24 @@ import { fetchProducts, deleteProduct } from "../store/slices/productsSlice";
 function ProductList() {
   const dispatch = useDispatch();
   const {
-    items: products,
-    loading,
-    error,
+    items: produtos,
+    carregando,
+    erro,
   } = useSelector((state) => state.products);
 
   useEffect(() => {
     dispatch(fetchProducts());
   }, [dispatch]);
 
-  const handleDelete = async (id) => {
-    if (window.confirm("Are you sure you want to delete this product?")) {
+  const handleExcluir = async (id) => {
+    if (window.confirm("Tem certeza que deseja excluir este produto?")) {
       await dispatch(deleteProduct(id));
       dispatch(fetchProducts());
     }
   };
 
-  if (loading) return <div className="loading">Loading products...</div>;
-  if (error) return <div className="error">Error: {error}</div>;
+  if (carregando) return <div className="loading">Carregando produtos...</div>;
+  if (erro) return <div className="error">Erro: {erro}</div>;
 
   return (
     <div className="container">
@@ -34,47 +34,91 @@ function ProductList() {
             justifyContent: "space-between",
             alignItems: "center",
             marginBottom: "1.5rem",
+            flexWrap: "wrap",
+            gap: "1rem",
           }}
         >
-          <h2>Products</h2>
-          <Link to="/products/new" className="btn btn-primary">
-            Add New Product
+          <div>
+            <h2 style={{ marginBottom: "0.5rem" }}>📦 Produtos</h2>
+            <p style={{ color: "#7f8c8d", margin: 0 }}>
+              {produtos.length} produto(s) cadastrado(s)
+            </p>
+          </div>
+          <Link to="/products/new" className="btn btn-success">
+            ➕ Adicionar Novo Produto
           </Link>
         </div>
 
-        {products.length === 0 ? (
-          <p>No products found. Create your first product!</p>
+        {produtos.length === 0 ? (
+          <div
+            style={{
+              textAlign: "center",
+              padding: "3rem",
+              background: "rgba(102, 126, 234, 0.05)",
+              borderRadius: "15px",
+            }}
+          >
+            <div style={{ fontSize: "4rem", marginBottom: "1rem" }}>📦</div>
+            <h3 style={{ color: "#2c3e50", marginBottom: "0.5rem" }}>
+              Nenhum produto cadastrado
+            </h3>
+            <p style={{ color: "#7f8c8d", marginBottom: "1.5rem" }}>
+              Comece criando seu primeiro produto!
+            </p>
+            <Link to="/products/new" className="btn btn-success">
+              ➕ Criar Primeiro Produto
+            </Link>
+          </div>
         ) : (
           <div className="table-container">
             <table>
               <thead>
                 <tr>
-                  <th>ID</th>
-                  <th>Name</th>
-                  <th>Value</th>
-                  <th>Raw Materials</th>
-                  <th>Actions</th>
+                  <th>🆔 ID</th>
+                  <th>📦 Nome</th>
+                  <th>💰 Valor</th>
+                  <th>🧪 Matérias-Primas</th>
+                  <th>⚙️ Ações</th>
                 </tr>
               </thead>
               <tbody>
-                {products.map((product) => (
-                  <tr key={product.id}>
-                    <td>{product.id}</td>
-                    <td>{product.name}</td>
-                    <td>${product.value}</td>
-                    <td>{product.rawMaterials?.length || 0} material(s)</td>
+                {produtos.map((produto) => (
+                  <tr key={produto.id}>
+                    <td>
+                      <strong>#{produto.id}</strong>
+                    </td>
+                    <td style={{ fontWeight: 600 }}>{produto.name}</td>
+                    <td style={{ color: "#27ae60", fontWeight: 600 }}>
+                      R${" "}
+                      {parseFloat(produto.value).toFixed(2).replace(".", ",")}
+                    </td>
+                    <td>
+                      <span
+                        style={{
+                          background: "rgba(102, 126, 234, 0.1)",
+                          padding: "0.3rem 0.8rem",
+                          borderRadius: "15px",
+                          fontSize: "0.9rem",
+                          fontWeight: 600,
+                        }}
+                      >
+                        {produto.rawMaterials?.length || 0} material(is)
+                      </span>
+                    </td>
                     <td className="table-actions">
                       <Link
-                        to={`/products/edit/${product.id}`}
+                        to={`/products/edit/${produto.id}`}
                         className="btn btn-primary"
+                        style={{ fontSize: "0.85rem", padding: "0.5rem 1rem" }}
                       >
-                        Edit
+                        ✏️ Editar
                       </Link>
                       <button
-                        onClick={() => handleDelete(product.id)}
+                        onClick={() => handleExcluir(produto.id)}
                         className="btn btn-danger"
+                        style={{ fontSize: "0.85rem", padding: "0.5rem 1rem" }}
                       >
-                        Delete
+                        🗑️ Excluir
                       </button>
                     </td>
                   </tr>

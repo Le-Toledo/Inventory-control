@@ -2,9 +2,9 @@ import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import {
-  createRawMaterial,
-  updateRawMaterial,
-  fetchRawMaterials,
+  criarMateriaPrima,
+  atualizarMateriaPrimaAsync,
+  buscarMateriasPrimas,
 } from "../store/slices/rawMaterialsSlice";
 
 function RawMaterialForm() {
@@ -12,73 +12,124 @@ function RawMaterialForm() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const { items: rawMaterials } = useSelector((state) => state.rawMaterials);
+  const { items: materiasPrimas } = useSelector(
+    (state) => state.materiasPrimas,
+  );
 
-  const [formData, setFormData] = useState({
+  const [dadosFormulario, setDadosFormulario] = useState({
     name: "",
     stockQuantity: "",
+    unitCost: "",
+    unit: "QUANTITY",
   });
 
   useEffect(() => {
     if (id) {
-      dispatch(fetchRawMaterials());
+      dispatch(buscarMateriasPrimas());
     }
   }, [dispatch, id]);
 
   useEffect(() => {
-    if (id && rawMaterials.length > 0) {
-      const material = rawMaterials.find((rm) => rm.id === parseInt(id));
-      if (material) {
-        setFormData({
-          name: material.name,
-          stockQuantity: material.stockQuantity,
+    if (id && materiasPrimas.length > 0) {
+      const materiaPrima = materiasPrimas.find((mp) => mp.id === parseInt(id));
+      if (materiaPrima) {
+        setDadosFormulario({
+          name: materiaPrima.name,
+          stockQuantity: materiaPrima.stockQuantity,
+          unitCost: materiaPrima.unitCost || 0,
+          unit: materiaPrima.unit || "QUANTITY",
         });
       }
     }
-  }, [id, rawMaterials]);
+  }, [id, materiasPrimas]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const dadosParaEnviar = {
+      name: dadosFormulario.name,
+      stockQuantity: parseInt(dadosFormulario.stockQuantity),
+      unitCost: parseFloat(dadosFormulario.unitCost),
+      unit: dadosFormulario.unit,
+    };
+
     try {
       if (id) {
         await dispatch(
-          updateRawMaterial({ id: parseInt(id), rawMaterial: formData }),
+          atualizarMateriaPrimaAsync({
+            id: parseInt(id),
+            data: dadosParaEnviar,
+          }),
         );
       } else {
-        await dispatch(createRawMaterial(formData));
+        await dispatch(criarMateriaPrima(dadosParaEnviar));
       }
       navigate("/raw-materials");
-    } catch (error) {
-      alert("Error saving raw material: " + error.message);
+    } catch (erro) {
+      alert("Erro ao salvar matéria-prima: " + erro.message);
     }
   };
 
   return (
     <div className="container">
       <div className="card">
-        <h2>{id ? "Edit Raw Material" : "New Raw Material"}</h2>
+        <h2>{id ? "Editar Matéria-Prima" : "Nova Matéria-Prima"}</h2>
 
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label>Name *</label>
+            <label>Nome </label>
             <input
               type="text"
-              value={formData.name}
+              value={dadosFormulario.name}
               onChange={(e) =>
-                setFormData({ ...formData, name: e.target.value })
+                setDadosFormulario({ ...dadosFormulario, name: e.target.value })
               }
               required
             />
           </div>
 
           <div className="form-group">
-            <label>Stock Quantity *</label>
+            <label>Quantidade em Estoque </label>
             <input
               type="number"
-              value={formData.stockQuantity}
+              value={dadosFormulario.stockQuantity}
               onChange={(e) =>
-                setFormData({ ...formData, stockQuantity: e.target.value })
+                setDadosFormulario({
+                  ...dadosFormulario,
+                  stockQuantity: e.target.value,
+                })
+              }
+              min="0"
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Unidade de Medida </label>
+            <select
+              value={dadosFormulario.unit}
+              onChange={(e) =>
+                setDadosFormulario({ ...dadosFormulario, unit: e.target.value })
+              }
+              required
+            >
+              <option value="QUANTITY">Quantidade</option>
+              <option value="WEIGHT">Peso (Kg)</option>
+              <option value="LITERS">Litros</option>
+            </select>
+          </div>
+
+          <div className="form-group">
+            <label>Custo Unitário (R$) </label>
+            <input
+              type="number"
+              step="0.01"
+              value={dadosFormulario.unitCost}
+              onChange={(e) =>
+                setDadosFormulario({
+                  ...dadosFormulario,
+                  unitCost: e.target.value,
+                })
               }
               min="0"
               required
@@ -87,14 +138,14 @@ function RawMaterialForm() {
 
           <div className="form-actions">
             <button type="submit" className="btn btn-success">
-              {id ? "Update Raw Material" : "Create Raw Material"}
+              {id ? "Atualizar" : "Criar"}
             </button>
             <button
               type="button"
               onClick={() => navigate("/raw-materials")}
               className="btn btn-secondary"
             >
-              Cancel
+              Cancelar
             </button>
           </div>
         </form>

@@ -13,23 +13,23 @@ const productionSlice = createSlice({
   name: "production",
   initialState: {
     report: null,
-    loading: false,
-    error: null,
+    carregando: false,
+    erro: null,
   },
   reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(calculateProduction.pending, (state) => {
-        state.loading = true;
-        state.error = null;
+        state.carregando = true;
+        state.erro = null;
       })
       .addCase(calculateProduction.fulfilled, (state, action) => {
-        state.loading = false;
+        state.carregando = false;
         state.report = action.payload;
       })
       .addCase(calculateProduction.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.error.message;
+        state.carregando = false;
+        state.erro = action.error.message;
       });
   },
 });
