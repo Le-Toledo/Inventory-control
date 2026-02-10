@@ -6,7 +6,7 @@ import {
   updateProduct,
   fetchProducts,
 } from "../store/slices/productsSlice";
-import { buscarMateriasPrimas } from "../store/slices/rawMaterialsSlice";
+import { buscarMateriasPrimas } from "../store/slices/materiasPrimasSlice";
 
 function ProductForm() {
   const { id } = useParams();
@@ -38,10 +38,18 @@ function ProductForm() {
     if (id && produtos.length > 0) {
       const produto = produtos.find((p) => p.id === parseInt(id));
       if (produto) {
+        const materiasPrimasNormalizadas = (produto.materiasPrimas || []).map(
+          (mp) => ({
+            idMateriaPrima: mp.materiaPrimaId ?? mp.idMateriaPrima,
+            nomeMateriaPrima: mp.materiaPrimaName ?? mp.nomeMateriaPrima,
+            quantidadeNecessaria:
+              mp.quantityRequired ?? mp.quantidadeNecessaria,
+          }),
+        );
         setDadosFormulario({
           name: produto.name,
           value: produto.value,
-          materiasPrimas: produto.rawMaterials || [],
+          materiasPrimas: materiasPrimasNormalizadas,
         });
       }
     }
@@ -55,9 +63,9 @@ function ProductForm() {
       const dadosParaAPI = {
         name: dadosFormulario.name,
         value: dadosFormulario.value,
-        rawMaterials: dadosFormulario.materiasPrimas.map((mp) => ({
-          rawMaterialId: mp.idMateriaPrima,
-          rawMaterialName: mp.nomeMateriaPrima,
+        materiasPrimas: dadosFormulario.materiasPrimas.map((mp) => ({
+          materiaPrimaId: mp.idMateriaPrima,
+          materiaPrimaName: mp.nomeMateriaPrima,
           quantityRequired: mp.quantidadeNecessaria,
         })),
       };
@@ -116,6 +124,17 @@ function ProductForm() {
         <h2>{id ? "Editar Produto" : "Novo Produto"}</h2>
 
         <form onSubmit={handleSubmit}>
+          {id && produtos.length > 0 && (
+            <div className="form-group">
+              <label>Codigo do Produto</label>
+              <input
+                type="text"
+                value={produtos.find((p) => p.id === parseInt(id))?.code || ""}
+                readOnly
+              />
+            </div>
+          )}
+
           <div className="form-group">
             <label>Nome do Produto </label>
             <input

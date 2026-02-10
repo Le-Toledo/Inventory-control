@@ -23,9 +23,9 @@ function Navigation() {
         </li>
         <li>
           <Link
-            to="/raw-materials"
+            to="/materias-primas"
             className={
-              location.pathname.includes("/raw-materials") ? "active" : ""
+              location.pathname.includes("/materias-primas") ? "active" : ""
             }
           >
             Matérias-Primas
@@ -45,3 +45,4 @@ function Navigation() {
 }
 
 export default Navigation;
+

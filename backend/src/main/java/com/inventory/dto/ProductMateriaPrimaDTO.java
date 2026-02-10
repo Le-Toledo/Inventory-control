@@ -9,15 +9,16 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductRawMaterialDTO {
+public class ProductMateriaPrimaDTO {
     private Long id;
     
-    @NotNull(message = "Raw material ID is required")
-    private Long rawMaterialId;
+    @NotNull(message = "Materia prima ID is required")
+    private Long materiaPrimaId;
     
-    private String rawMaterialName;
+    private String materiaPrimaName;
     
     @NotNull(message = "Quantity required is required")
     @Positive(message = "Quantity required must be positive")
     private Integer quantityRequired;
 }
+

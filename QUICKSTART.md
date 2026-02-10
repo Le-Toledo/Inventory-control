@@ -170,10 +170,10 @@ Frontend runs on: http://localhost:3000
 ## 4. First Steps
 
 1. Access http://localhost:3000
-2. Navigate to "Raw Materials"
-3. Add some raw materials (e.g., Steel, Aluminum, Wood)
+2. Navigate to "Materias-Primas"
+3. Add some Materias-Primas (e.g., Steel, Aluminum, Wood)
 4. Navigate to "Products"
-5. Create products and associate raw materials
+5. Create products and associate Materias-Primas
 6. View "Production Report" to see what can be produced
 
 ## Testing
@@ -215,3 +215,4 @@ npx cypress open
 
 - Verify backend CORS configuration in `WebConfig.java`
 - Ensure frontend API URL matches backend URL
+

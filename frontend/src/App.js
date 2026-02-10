@@ -4,8 +4,8 @@ import Navigation from "./components/Navigation";
 import Home from "./pages/Home";
 import ProductList from "./pages/ProductList";
 import ProductForm from "./pages/ProductForm";
-import RawMaterialList from "./pages/RawMaterialList";
-import RawMaterialForm from "./pages/RawMaterialForm";
+import MateriaPrimaList from "./pages/MateriaPrimaList";
+import MateriaPrimaForm from "./pages/MateriaPrimaForm";
 import ProductionReport from "./pages/ProductionReport";
 
 function App() {
@@ -17,9 +17,9 @@ function App() {
         <Route path="/products" element={<ProductList />} />
         <Route path="/products/new" element={<ProductForm />} />
         <Route path="/products/edit/:id" element={<ProductForm />} />
-        <Route path="/raw-materials" element={<RawMaterialList />} />
-        <Route path="/raw-materials/new" element={<RawMaterialForm />} />
-        <Route path="/raw-materials/edit/:id" element={<RawMaterialForm />} />
+        <Route path="/materias-primas" element={<MateriaPrimaList />} />
+        <Route path="/materias-primas/new" element={<MateriaPrimaForm />} />
+        <Route path="/materias-primas/edit/:id" element={<MateriaPrimaForm />} />
         <Route path="/production" element={<ProductionReport />} />
       </Routes>
     </Router>
@@ -27,3 +27,4 @@ function App() {
 }
 
 export default App;
+

@@ -4,9 +4,9 @@ import { Link } from "react-router-dom";
 import {
   buscarMateriasPrimas,
   excluirMateriaPrimaAsync,
-} from "../store/slices/rawMaterialsSlice";
+} from "../store/slices/materiasPrimasSlice";
 
-function RawMaterialList() {
+function MateriaPrimaList() {
   const dispatch = useDispatch();
   const {
     items: materiasPrimas,
@@ -57,7 +57,7 @@ function RawMaterialList() {
               {materiasPrimas.length} matéria(s)-prima(s) cadastrada(s)
             </p>
           </div>
-          <Link to="/raw-materials/new" className="btn btn-success">
+          <Link to="/materias-primas/new" className="btn btn-success">
             ➕ Adicionar Nova Matéria-Prima
           </Link>
         </div>
@@ -78,7 +78,7 @@ function RawMaterialList() {
             <p style={{ color: "#7f8c8d", marginBottom: "1.5rem" }}>
               Comece cadastrando suas matérias-primas!
             </p>
-            <Link to="/raw-materials/new" className="btn btn-success">
+            <Link to="/materias-primas/new" className="btn btn-success">
               ➕ Criar Primeira Matéria-Prima
             </Link>
           </div>
@@ -147,7 +147,7 @@ function RawMaterialList() {
                     </td>
                     <td className="table-actions">
                       <Link
-                        to={`/raw-materials/edit/${materiaPrima.id}`}
+                        to={`/materias-primas/edit/${materiaPrima.id}`}
                         className="btn btn-primary"
                         style={{ fontSize: "0.85rem", padding: "0.5rem 1rem" }}
                       >
@@ -172,4 +172,4 @@ function RawMaterialList() {
   );
 }
 
-export default RawMaterialList;
+export default MateriaPrimaList;

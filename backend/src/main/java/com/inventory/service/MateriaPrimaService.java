@@ -1,71 +1,82 @@
 package com.inventory.service;
 
-import com.inventory.dto.RawMaterialDTO;
-import com.inventory.entity.RawMaterial;
+import com.inventory.dto.MateriaPrimaDTO;
+import com.inventory.entity.MateriaPrima;
 import com.inventory.exception.ResourceNotFoundException;
-import com.inventory.repository.RawMaterialRepository;
+import com.inventory.repository.MateriaPrimaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class RawMaterialService {
+public class MateriaPrimaService {
     
-    private final RawMaterialRepository rawMaterialRepository;
+    private final MateriaPrimaRepository materiaPrimaRepository;
     
     @Transactional(readOnly = true)
-    public List<RawMaterialDTO> findAll() {
-        return rawMaterialRepository.findAll().stream()
+    public List<MateriaPrimaDTO> findAll() {
+        return materiaPrimaRepository.findAll().stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
     
     @Transactional(readOnly = true)
-    public RawMaterialDTO findById(Long id) {
-        RawMaterial rawMaterial = rawMaterialRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Raw material not found with id: " + id));
-        return convertToDTO(rawMaterial);
+    public MateriaPrimaDTO findById(Long id) {
+        Long safeId = Objects.requireNonNull(id, "id is required");
+        MateriaPrima materiaPrima = materiaPrimaRepository.findById(safeId)
+            .orElseThrow(() -> new ResourceNotFoundException("Materia prima not found with id: " + safeId));
+        return convertToDTO(materiaPrima);
     }
     
     @Transactional
-    public RawMaterialDTO create(RawMaterialDTO rawMaterialDTO) {
-        RawMaterial rawMaterial = new RawMaterial();
-        rawMaterial.setName(rawMaterialDTO.getName());
-        rawMaterial.setStockQuantity(rawMaterialDTO.getStockQuantity());
+    public MateriaPrimaDTO create(MateriaPrimaDTO materiaPrimaDTO) {
+        MateriaPrima materiaPrima = new MateriaPrima();
+        materiaPrima.setName(materiaPrimaDTO.getName());
+        materiaPrima.setStockQuantity(materiaPrimaDTO.getStockQuantity());
+        materiaPrima.setUnitCost(materiaPrimaDTO.getUnitCost());
+        materiaPrima.setUnit(materiaPrimaDTO.getUnit());
         
-        RawMaterial savedRawMaterial = rawMaterialRepository.save(rawMaterial);
-        return convertToDTO(savedRawMaterial);
+        MateriaPrima savedMateriaPrima = materiaPrimaRepository.save(materiaPrima);
+        return convertToDTO(savedMateriaPrima);
     }
     
     @Transactional
-    public RawMaterialDTO update(Long id, RawMaterialDTO rawMaterialDTO) {
-        RawMaterial rawMaterial = rawMaterialRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Raw material not found with id: " + id));
+    public MateriaPrimaDTO update(Long id, MateriaPrimaDTO materiaPrimaDTO) {
+        Long safeId = Objects.requireNonNull(id, "id is required");
+        MateriaPrima materiaPrima = materiaPrimaRepository.findById(safeId)
+            .orElseThrow(() -> new ResourceNotFoundException("Materia prima not found with id: " + safeId));
         
-        rawMaterial.setName(rawMaterialDTO.getName());
-        rawMaterial.setStockQuantity(rawMaterialDTO.getStockQuantity());
+        materiaPrima.setName(materiaPrimaDTO.getName());
+        materiaPrima.setStockQuantity(materiaPrimaDTO.getStockQuantity());
+        materiaPrima.setUnitCost(materiaPrimaDTO.getUnitCost());
+        materiaPrima.setUnit(materiaPrimaDTO.getUnit());
         
-        RawMaterial updatedRawMaterial = rawMaterialRepository.save(rawMaterial);
-        return convertToDTO(updatedRawMaterial);
+        MateriaPrima updatedMateriaPrima = materiaPrimaRepository.save(materiaPrima);
+        return convertToDTO(updatedMateriaPrima);
     }
     
     @Transactional
     public void delete(Long id) {
-        if (!rawMaterialRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Raw material not found with id: " + id);
+        Long safeId = Objects.requireNonNull(id, "id is required");
+        if (!materiaPrimaRepository.existsById(safeId)) {
+            throw new ResourceNotFoundException("Materia prima not found with id: " + safeId);
         }
-        rawMaterialRepository.deleteById(id);
+        materiaPrimaRepository.deleteById(safeId);
     }
     
-    private RawMaterialDTO convertToDTO(RawMaterial rawMaterial) {
-        RawMaterialDTO dto = new RawMaterialDTO();
-        dto.setId(rawMaterial.getId());
-        dto.setName(rawMaterial.getName());
-        dto.setStockQuantity(rawMaterial.getStockQuantity());
+    private MateriaPrimaDTO convertToDTO(MateriaPrima materiaPrima) {
+        MateriaPrimaDTO dto = new MateriaPrimaDTO();
+        dto.setId(materiaPrima.getId());
+        dto.setName(materiaPrima.getName());
+        dto.setStockQuantity(materiaPrima.getStockQuantity());
+        dto.setUnitCost(materiaPrima.getUnitCost());
+        dto.setUnit(materiaPrima.getUnit());
         return dto;
     }
 }
+

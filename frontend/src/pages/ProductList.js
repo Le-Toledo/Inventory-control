@@ -75,6 +75,7 @@ function ProductList() {
               <thead>
                 <tr>
                   <th>🆔 ID</th>
+                  <th>🔖 Codigo</th>
                   <th>📦 Nome</th>
                   <th>💰 Valor</th>
                   <th>🧪 Matérias-Primas</th>
@@ -87,6 +88,7 @@ function ProductList() {
                     <td>
                       <strong>#{produto.id}</strong>
                     </td>
+                    <td>{produto.code}</td>
                     <td style={{ fontWeight: 600 }}>{produto.name}</td>
                     <td style={{ color: "#27ae60", fontWeight: 600 }}>
                       R${" "}
@@ -102,7 +104,7 @@ function ProductList() {
                           fontWeight: 600,
                         }}
                       >
-                        {produto.rawMaterials?.length || 0} material(is)
+                        {produto.materiasPrimas?.length || 0} material(is)
                       </span>
                     </td>
                     <td className="table-actions">

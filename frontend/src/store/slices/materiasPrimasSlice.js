@@ -1,11 +1,11 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { servicoMateriaPrima } from "../../services/inventoryService";
+import { materiasPrimasService } from "../../services/materiasPrimasService";
 
 // Async thunk for fetching materias primas
 export const buscarMateriasPrimas = createAsyncThunk(
   "materiasPrimas/buscarMateriasPrimas",
   async () => {
-    const response = await servicoMateriaPrima.getAll();
+    const response = await materiasPrimasService.getAll();
     return response.data;
   },
 );
@@ -14,7 +14,7 @@ export const buscarMateriasPrimas = createAsyncThunk(
 export const criarMateriaPrima = createAsyncThunk(
   "materiasPrimas/criarMateriaPrima",
   async (dadosMateriaPrima) => {
-    const response = await servicoMateriaPrima.create(dadosMateriaPrima);
+    const response = await materiasPrimasService.create(dadosMateriaPrima);
     return response.data;
   },
 );
@@ -23,7 +23,7 @@ export const criarMateriaPrima = createAsyncThunk(
 export const atualizarMateriaPrimaAsync = createAsyncThunk(
   "materiasPrimas/atualizarMateriaPrima",
   async ({ id, data }) => {
-    const response = await servicoMateriaPrima.update(id, data);
+    const response = await materiasPrimasService.update(id, data);
     return response.data;
   },
 );
@@ -32,7 +32,7 @@ export const atualizarMateriaPrimaAsync = createAsyncThunk(
 export const excluirMateriaPrimaAsync = createAsyncThunk(
   "materiasPrimas/excluirMateriaPrima",
   async (id) => {
-    await servicoMateriaPrima.delete(id);
+    await materiasPrimasService.delete(id);
     return id;
   },
 );

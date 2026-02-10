@@ -1,19 +1,20 @@
 package com.inventory.service;
 
 import com.inventory.dto.ProductDTO;
-import com.inventory.dto.ProductRawMaterialDTO;
+import com.inventory.dto.ProductMateriaPrimaDTO;
 import com.inventory.entity.Product;
-import com.inventory.entity.ProductRawMaterial;
-import com.inventory.entity.RawMaterial;
+import com.inventory.entity.ProductMateriaPrima;
+import com.inventory.entity.MateriaPrima;
 import com.inventory.exception.ResourceNotFoundException;
-import com.inventory.repository.ProductRawMaterialRepository;
+import com.inventory.repository.ProductMateriaPrimaRepository;
 import com.inventory.repository.ProductRepository;
-import com.inventory.repository.RawMaterialRepository;
+import com.inventory.repository.MateriaPrimaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -21,21 +22,22 @@ import java.util.stream.Collectors;
 public class ProductService {
     
     private final ProductRepository productRepository;
-    private final RawMaterialRepository rawMaterialRepository;
-    private final ProductRawMaterialRepository productRawMaterialRepository;
+    private final MateriaPrimaRepository materiaPrimaRepository;
+    private final ProductMateriaPrimaRepository productMateriaPrimaRepository;
     
     @Transactional(readOnly = true)
     public List<ProductDTO> findAll() {
-        return productRepository.findAllWithRawMaterials().stream()
+        return productRepository.findAllWithMateriaPrimas().stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
     
     @Transactional(readOnly = true)
     public ProductDTO findById(Long id) {
-        Product product = productRepository.findByIdWithRawMaterials(id);
+        Long safeId = Objects.requireNonNull(id, "id is required");
+        Product product = productRepository.findByIdWithMateriaPrimas(safeId);
         if (product == null) {
-            throw new ResourceNotFoundException("Product not found with id: " + id);
+            throw new ResourceNotFoundException("Product not found with id: " + safeId);
         }
         return convertToDTO(product);
     }
@@ -45,56 +47,62 @@ public class ProductService {
         Product product = new Product();
         product.setName(productDTO.getName());
         product.setValue(productDTO.getValue());
-        
+        product.setCode(generateTemporaryCode());
+
         Product savedProduct = productRepository.save(product);
+        savedProduct.setCode(generateProductCode(savedProduct.getId()));
+        savedProduct = productRepository.save(savedProduct);
         
-        if (productDTO.getRawMaterials() != null && !productDTO.getRawMaterials().isEmpty()) {
-            updateProductRawMaterials(savedProduct, productDTO.getRawMaterials());
+        if (productDTO.getMateriasPrimas() != null && !productDTO.getMateriasPrimas().isEmpty()) {
+            updateProductMateriasPrimas(savedProduct, productDTO.getMateriasPrimas());
         }
         
-        return convertToDTO(productRepository.findByIdWithRawMaterials(savedProduct.getId()));
+        return convertToDTO(productRepository.findByIdWithMateriaPrimas(savedProduct.getId()));
     }
     
     @Transactional
     public ProductDTO update(Long id, ProductDTO productDTO) {
-        Product product = productRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + id));
+        Long safeId = Objects.requireNonNull(id, "id is required");
+        Product product = productRepository.findById(safeId)
+            .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + safeId));
         
         product.setName(productDTO.getName());
         product.setValue(productDTO.getValue());
         
-        if (productDTO.getRawMaterials() != null) {
+        if (productDTO.getMateriasPrimas() != null) {
             // Remove existing associations
-            productRawMaterialRepository.deleteByProductId(id);
-            product.getProductRawMaterials().clear();
+            productMateriaPrimaRepository.deleteByProductId(safeId);
+            product.getProductMateriaPrimas().clear();
             
             // Add new associations
-            updateProductRawMaterials(product, productDTO.getRawMaterials());
+            updateProductMateriasPrimas(product, productDTO.getMateriasPrimas());
         }
         
         productRepository.save(product);
-        return convertToDTO(productRepository.findByIdWithRawMaterials(id));
+        return convertToDTO(productRepository.findByIdWithMateriaPrimas(safeId));
     }
     
     @Transactional
     public void delete(Long id) {
-        if (!productRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Product not found with id: " + id);
+        Long safeId = Objects.requireNonNull(id, "id is required");
+        if (!productRepository.existsById(safeId)) {
+            throw new ResourceNotFoundException("Product not found with id: " + safeId);
         }
-        productRepository.deleteById(id);
+        productRepository.deleteById(safeId);
     }
     
-    private void updateProductRawMaterials(Product product, List<ProductRawMaterialDTO> rawMaterialsDTO) {
-        for (ProductRawMaterialDTO dto : rawMaterialsDTO) {
-            RawMaterial rawMaterial = rawMaterialRepository.findById(dto.getRawMaterialId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Raw material not found with id: " + dto.getRawMaterialId()));
+    private void updateProductMateriasPrimas(Product product, List<ProductMateriaPrimaDTO> materiasPrimasDTO) {
+        for (ProductMateriaPrimaDTO dto : materiasPrimasDTO) {
+            Long materiaPrimaId = Objects.requireNonNull(dto.getMateriaPrimaId(), "materiaPrimaId is required");
+            MateriaPrima materiaPrima = materiaPrimaRepository.findById(materiaPrimaId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Materia prima not found with id: " + materiaPrimaId));
             
-            ProductRawMaterial productRawMaterial = new ProductRawMaterial();
-            productRawMaterial.setProduct(product);
-            productRawMaterial.setRawMaterial(rawMaterial);
-            productRawMaterial.setQuantityRequired(dto.getQuantityRequired());
+            ProductMateriaPrima productMateriaPrima = new ProductMateriaPrima();
+            productMateriaPrima.setProduct(product);
+            productMateriaPrima.setMateriaPrima(materiaPrima);
+            productMateriaPrima.setQuantityRequired(dto.getQuantityRequired());
             
-            product.getProductRawMaterials().add(productRawMaterial);
+            product.getProductMateriaPrimas().add(productMateriaPrima);
         }
     }
     
@@ -102,22 +110,32 @@ public class ProductService {
         ProductDTO dto = new ProductDTO();
         dto.setId(product.getId());
         dto.setName(product.getName());
+        dto.setCode(product.getCode());
         dto.setValue(product.getValue());
         
-        if (product.getProductRawMaterials() != null) {
-            List<ProductRawMaterialDTO> rawMaterialsDTO = product.getProductRawMaterials().stream()
+        if (product.getProductMateriaPrimas() != null) {
+            List<ProductMateriaPrimaDTO> materiasPrimasDTO = product.getProductMateriaPrimas().stream()
                     .map(prm -> {
-                        ProductRawMaterialDTO rmDTO = new ProductRawMaterialDTO();
+                        ProductMateriaPrimaDTO rmDTO = new ProductMateriaPrimaDTO();
                         rmDTO.setId(prm.getId());
-                        rmDTO.setRawMaterialId(prm.getRawMaterial().getId());
-                        rmDTO.setRawMaterialName(prm.getRawMaterial().getName());
+                        rmDTO.setMateriaPrimaId(prm.getMateriaPrima().getId());
+                        rmDTO.setMateriaPrimaName(prm.getMateriaPrima().getName());
                         rmDTO.setQuantityRequired(prm.getQuantityRequired());
                         return rmDTO;
                     })
                     .collect(Collectors.toList());
-            dto.setRawMaterials(rawMaterialsDTO);
+            dto.setMateriasPrimas(materiasPrimasDTO);
         }
         
         return dto;
     }
+
+    private String generateProductCode(Long id) {
+        return String.format("PRD-%06d", id);
+    }
+
+    private String generateTemporaryCode() {
+        return "TMP-" + java.util.UUID.randomUUID();
+    }
 }
+

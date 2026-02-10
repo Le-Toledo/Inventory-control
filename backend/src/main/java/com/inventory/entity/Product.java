@@ -26,6 +26,9 @@ public class Product {
     @NotBlank(message = "Product name is required")
     @Column(nullable = false)
     private String name;
+
+    @Column(nullable = false, unique = true)
+    private String code;
     
     @NotNull(message = "Product value is required")
     @Positive(message = "Product value must be positive")
@@ -33,18 +36,19 @@ public class Product {
     private BigDecimal value;
     
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ProductRawMaterial> productRawMaterials = new ArrayList<>();
+    private List<ProductMateriaPrima> productMateriaPrimas = new ArrayList<>();
     
-    public void addRawMaterial(RawMaterial rawMaterial, Integer quantity) {
-        ProductRawMaterial productRawMaterial = new ProductRawMaterial();
-        productRawMaterial.setProduct(this);
-        productRawMaterial.setRawMaterial(rawMaterial);
-        productRawMaterial.setQuantityRequired(quantity);
-        productRawMaterials.add(productRawMaterial);
+    public void addMateriaPrima(MateriaPrima materiaPrima, Integer quantity) {
+        ProductMateriaPrima productMateriaPrima = new ProductMateriaPrima();
+        productMateriaPrima.setProduct(this);
+        productMateriaPrima.setMateriaPrima(materiaPrima);
+        productMateriaPrima.setQuantityRequired(quantity);
+        productMateriaPrimas.add(productMateriaPrima);
     }
     
-    public void removeRawMaterial(ProductRawMaterial productRawMaterial) {
-        productRawMaterials.remove(productRawMaterial);
-        productRawMaterial.setProduct(null);
+    public void removeMateriaPrima(ProductMateriaPrima productMateriaPrima) {
+        productMateriaPrimas.remove(productMateriaPrima);
+        productMateriaPrima.setProduct(null);
     }
 }
+

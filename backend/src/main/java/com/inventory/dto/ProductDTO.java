@@ -18,10 +18,13 @@ public class ProductDTO {
     
     @NotBlank(message = "Product name is required")
     private String name;
+
+    private String code;
     
     @NotNull(message = "Product value is required")
     @Positive(message = "Product value must be positive")
     private BigDecimal value;
     
-    private List<ProductRawMaterialDTO> rawMaterials;
+    private List<ProductMateriaPrimaDTO> materiasPrimas;
 }
+

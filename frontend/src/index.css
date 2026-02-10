@@ -324,12 +324,12 @@ tr:last-child td:last-child {
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-/* Raw Materials List */
-.raw-materials-list {
+/* Materias Primas List */
+.materias-primas-list {
   margin-top: 1rem;
 }
 
-.raw-material-item {
+.materia-prima-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -339,7 +339,7 @@ tr:last-child td:last-child {
   margin-bottom: 0.5rem;
 }
 
-.raw-material-item button {
+.materia-prima-item button {
   padding: 0.25rem 0.75rem;
   font-size: 0.875rem;
 }

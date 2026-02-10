@@ -46,7 +46,7 @@ function Home() {
             </div>
           </Link>
 
-          <Link to="/raw-materials" style={{ textDecoration: "none" }}>
+          <Link to="/materias-primas" style={{ textDecoration: "none" }}>
             <div
               className="feature-card"
               style={{
@@ -169,3 +169,4 @@ function Home() {
 }
 
 export default Home;
+

@@ -5,9 +5,9 @@ import {
   criarMateriaPrima,
   atualizarMateriaPrimaAsync,
   buscarMateriasPrimas,
-} from "../store/slices/rawMaterialsSlice";
+} from "../store/slices/materiasPrimasSlice";
 
-function RawMaterialForm() {
+function MateriaPrimaForm() {
   const { id } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -22,6 +22,17 @@ function RawMaterialForm() {
     unitCost: "",
     unit: "QUANTITY",
   });
+
+  const normalizeDecimalInput = (value) =>
+    String(value ?? "")
+      .trim()
+      .replace(",", ".");
+
+  const parseUnitCost = (value) => {
+    const normalized = normalizeDecimalInput(value);
+    const parsed = parseFloat(normalized);
+    return Number.isNaN(parsed) ? null : parsed;
+  };
 
   useEffect(() => {
     if (id) {
@@ -46,10 +57,16 @@ function RawMaterialForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const unitCost = parseUnitCost(dadosFormulario.unitCost);
+    if (unitCost === null) {
+      alert("Informe um custo unitario valido");
+      return;
+    }
+
     const dadosParaEnviar = {
       name: dadosFormulario.name,
       stockQuantity: parseInt(dadosFormulario.stockQuantity),
-      unitCost: parseFloat(dadosFormulario.unitCost),
+      unitCost,
       unit: dadosFormulario.unit,
     };
 
@@ -64,7 +81,7 @@ function RawMaterialForm() {
       } else {
         await dispatch(criarMateriaPrima(dadosParaEnviar));
       }
-      navigate("/raw-materials");
+      navigate("/materias-primas");
     } catch (erro) {
       alert("Erro ao salvar matéria-prima: " + erro.message);
     }
@@ -122,7 +139,8 @@ function RawMaterialForm() {
           <div className="form-group">
             <label>Custo Unitário (R$) </label>
             <input
-              type="number"
+              type="text"
+              inputMode="decimal"
               step="0.01"
               value={dadosFormulario.unitCost}
               onChange={(e) =>
@@ -142,7 +160,7 @@ function RawMaterialForm() {
             </button>
             <button
               type="button"
-              onClick={() => navigate("/raw-materials")}
+              onClick={() => navigate("/materias-primas")}
               className="btn btn-secondary"
             >
               Cancelar
@@ -154,4 +172,4 @@ function RawMaterialForm() {
   );
 }
 
-export default RawMaterialForm;
+export default MateriaPrimaForm;

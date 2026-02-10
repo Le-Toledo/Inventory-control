@@ -19,4 +19,10 @@ public class ProductionController {
         ProductionReportDTO report = productionService.calculateProduction();
         return ResponseEntity.ok(report);
     }
+
+    @PostMapping("/consume")
+    public ResponseEntity<ProductionReportDTO> consumeProduction() {
+        ProductionReportDTO report = productionService.consumeProduction();
+        return ResponseEntity.ok(report);
+    }
 }

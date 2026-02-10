@@ -1,7 +1,7 @@
 package com.inventory.controller;
 
-import com.inventory.dto.RawMaterialDTO;
-import com.inventory.service.RawMaterialService;
+import com.inventory.dto.MateriaPrimaDTO;
+import com.inventory.service.MateriaPrimaService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -11,40 +11,41 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/raw-materials")
+@RequestMapping("/api/materias-primas")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "http://localhost:3000")
-public class RawMaterialController {
+public class MateriaPrimaController {
     
-    private final RawMaterialService rawMaterialService;
+    private final MateriaPrimaService materiaPrimaService;
     
     @GetMapping
-    public ResponseEntity<List<RawMaterialDTO>> getAllRawMaterials() {
-        List<RawMaterialDTO> rawMaterials = rawMaterialService.findAll();
-        return ResponseEntity.ok(rawMaterials);
+    public ResponseEntity<List<MateriaPrimaDTO>> getAllMateriasPrimas() {
+        List<MateriaPrimaDTO> materiasPrimas = materiaPrimaService.findAll();
+        return ResponseEntity.ok(materiasPrimas);
     }
     
     @GetMapping("/{id}")
-    public ResponseEntity<RawMaterialDTO> getRawMaterialById(@PathVariable Long id) {
-        RawMaterialDTO rawMaterial = rawMaterialService.findById(id);
-        return ResponseEntity.ok(rawMaterial);
+    public ResponseEntity<MateriaPrimaDTO> getMateriaPrimaById(@PathVariable Long id) {
+        MateriaPrimaDTO materiaPrima = materiaPrimaService.findById(id);
+        return ResponseEntity.ok(materiaPrima);
     }
     
     @PostMapping
-    public ResponseEntity<RawMaterialDTO> createRawMaterial(@Valid @RequestBody RawMaterialDTO rawMaterialDTO) {
-        RawMaterialDTO createdRawMaterial = rawMaterialService.create(rawMaterialDTO);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdRawMaterial);
+    public ResponseEntity<MateriaPrimaDTO> createMateriaPrima(@Valid @RequestBody MateriaPrimaDTO materiaPrimaDTO) {
+        MateriaPrimaDTO createdMateriaPrima = materiaPrimaService.create(materiaPrimaDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdMateriaPrima);
     }
     
     @PutMapping("/{id}")
-    public ResponseEntity<RawMaterialDTO> updateRawMaterial(@PathVariable Long id, @Valid @RequestBody RawMaterialDTO rawMaterialDTO) {
-        RawMaterialDTO updatedRawMaterial = rawMaterialService.update(id, rawMaterialDTO);
-        return ResponseEntity.ok(updatedRawMaterial);
+    public ResponseEntity<MateriaPrimaDTO> updateMateriaPrima(@PathVariable Long id, @Valid @RequestBody MateriaPrimaDTO materiaPrimaDTO) {
+        MateriaPrimaDTO updatedMateriaPrima = materiaPrimaService.update(id, materiaPrimaDTO);
+        return ResponseEntity.ok(updatedMateriaPrima);
     }
     
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteRawMaterial(@PathVariable Long id) {
-        rawMaterialService.delete(id);
+    public ResponseEntity<Void> deleteMateriaPrima(@PathVariable Long id) {
+        materiaPrimaService.delete(id);
         return ResponseEntity.noContent().build();
     }
 }
+

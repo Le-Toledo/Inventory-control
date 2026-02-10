@@ -15,4 +15,9 @@ public class ProductionSuggestionDTO {
     private Integer quantityCanProduce;
     private BigDecimal productValue;
     private BigDecimal totalValue;
+    private BigDecimal unitCost;
+    private BigDecimal unitProfit;
+    private BigDecimal totalCost;
+    private BigDecimal profit;
+    private BigDecimal profitMargin;
 }

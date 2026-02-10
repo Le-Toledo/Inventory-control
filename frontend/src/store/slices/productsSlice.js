@@ -1,10 +1,10 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { productService } from "../../services/inventoryService";
+import { productsService } from "../../services/productsService";
 
 export const fetchProducts = createAsyncThunk(
   "products/fetchProducts",
   async () => {
-    const response = await productService.getAll();
+    const response = await productsService.getAll();
     return response.data;
   },
 );
@@ -12,7 +12,7 @@ export const fetchProducts = createAsyncThunk(
 export const createProduct = createAsyncThunk(
   "products/createProduct",
   async (product) => {
-    const response = await productService.create(product);
+    const response = await productsService.create(product);
     return response.data;
   },
 );
@@ -20,7 +20,7 @@ export const createProduct = createAsyncThunk(
 export const updateProduct = createAsyncThunk(
   "products/updateProduct",
   async ({ id, product }) => {
-    const response = await productService.update(id, product);
+    const response = await productsService.update(id, product);
     return response.data;
   },
 );
@@ -28,7 +28,7 @@ export const updateProduct = createAsyncThunk(
 export const deleteProduct = createAsyncThunk(
   "products/deleteProduct",
   async (id) => {
-    await productService.delete(id);
+    await productsService.delete(id);
     return id;
   },
 );
