@@ -152,11 +152,11 @@ DELETE /api/products/{id}     # Remove produto
 ### Matérias-Primas
 
 ```http
-GET    /api/raw-materials         # Lista matérias-primas
-GET    /api/raw-materials/{id}    # Busca por ID
-POST   /api/raw-materials         # Cria nova matéria-prima
-PUT    /api/raw-materials/{id}    # Atualiza matéria-prima
-DELETE /api/raw-materials/{id}    # Remove matéria-prima
+GET    /api/materias-primas         # Lista matérias-primas
+GET    /api/materias-primas/{id}    # Busca por ID
+POST   /api/materias-primas         # Cria nova matéria-prima
+PUT    /api/materias-primas/{id}    # Atualiza matéria-prima
+DELETE /api/materias-primas/{id}    # Remove matéria-prima
 ```
 
 ### Produção
@@ -326,12 +326,12 @@ Projeto desenvolvido como desafio técnico para demonstração de habilidades em
 ### Functional Requirements
 
 - ✅ RF001: Product CRUD (Backend)
-- ✅ RF002: Raw Material CRUD (Backend)
-- ✅ RF003: Product-RawMaterial association (Backend)
+- ✅ RF002: Materia Prima CRUD (Backend)
+- ✅ RF003: Product-MateriaPrima association (Backend)
 - ✅ RF004: Production calculation (Backend)
 - ✅ RF005: Product CRUD (Frontend)
-- ✅ RF006: Raw Material CRUD (Frontend)
-- ✅ RF007: Product-RawMaterial association (Frontend)
+- ✅ RF006: Materia Prima CRUD (Frontend)
+- ✅ RF007: Product-MateriaPrima association (Frontend)
 - ✅ RF008: Production report (Frontend)
 
 ### Additional Features
@@ -435,7 +435,7 @@ npx cypress open
 
 **GET /api/products**
 
-- Returns all products with their raw materials
+- Returns all products with their Materias-Primas
 
 **GET /api/products/{id}**
 
@@ -450,9 +450,9 @@ npx cypress open
 {
   "name": "Chair",
   "value": 150.0,
-  "rawMaterials": [
+  "materiasPrimas": [
     {
-      "rawMaterialId": 1,
+      "materiaPrimaId": 1,
       "quantityRequired": 10
     }
   ]
@@ -467,19 +467,19 @@ npx cypress open
 
 - Deletes a product
 
-### Raw Materials API
+### Materias-Primas API
 
-**GET /api/raw-materials**
+**GET /api/materias-primas**
 
-- Returns all raw materials
+- Returns all Materias-Primas
 
-**GET /api/raw-materials/{id}**
+**GET /api/materias-primas/{id}**
 
-- Returns a specific raw material
+- Returns a specific Materia Prima
 
-**POST /api/raw-materials**
+**POST /api/materias-primas**
 
-- Creates a new raw material
+- Creates a new Materia Prima
 - Body:
 
 ```json
@@ -489,13 +489,13 @@ npx cypress open
 }
 ```
 
-**PUT /api/raw-materials/{id}**
+**PUT /api/materias-primas/{id}**
 
-- Updates an existing raw material
+- Updates an existing Materia Prima
 
-**DELETE /api/raw-materials/{id}**
+**DELETE /api/materias-primas/{id}**
 
-- Deletes a raw material
+- Deletes a Materia Prima
 
 ### Production API
 
@@ -528,17 +528,17 @@ npx cypress open
 - name
 - value
 
-### raw_materials
+### materias_primas
 
 - id (PK)
 - name
 - stock_quantity
 
-### product_raw_materials
+### product_materias_primas
 
 - id (PK)
 - product_id (FK)
-- raw_material_id (FK)
+- materia_prima_id (FK)
 - quantity_required
 
 ## 🎨 Features
@@ -547,11 +547,11 @@ npx cypress open
 
 - Create, view, update, and delete products
 - Set product values
-- Associate multiple raw materials with quantities
+- Associate multiple Materias-Primas with quantities
 
-### Raw Material Management
+### Materia Prima Management
 
-- Create, view, update, and delete raw materials
+- Create, view, update, and delete Materias-Primas
 - Track stock quantities
 - Real-time inventory updates
 
@@ -559,7 +559,7 @@ npx cypress open
 
 - Automatic calculation of producible items
 - Prioritization by product value
-- Optimal raw material allocation
+- Optimal Materia Prima allocation
 - Visual production report with total values
 
 ## 🧪 Testing
@@ -672,3 +672,6 @@ Created for Autoflex full-stack developer position assessment.
 ## 📞 Support
 
 For questions or issues, please refer to the code documentation or create an issue in the repository.
+
+#   I n v e n t o r y - c o n t r o l  
+ 
